@@ -56,6 +56,8 @@ def main():
         ('sec', 'secret', ['g', 'd', 'rm'], None),
         ('no', 'nodes', ['g', 'd'], ['sys']),
         ('ns', 'namespaces', ['g', 'd', 'rm'], ['sys']),
+        ('ro', 'rolebindings', ['g', 'd', 'rm'], ['sys']),
+        ('cro', 'clusterrolebindings', ['g', 'd', 'rm'], ['sys']),
         ]
     res_types = [r[0] for r in res]
 
