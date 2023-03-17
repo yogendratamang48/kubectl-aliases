@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright 2017 Google Inc.
@@ -50,6 +50,7 @@ def main():
     res = [
         ('po', 'pods', ['g', 'd', 'rm'], None),
         ('dep', 'deployment', ['g', 'd', 'rm'], None),
+        ('sts', 'statefulset', ['g', 'd', 'rm'], None),
         ('svc', 'service', ['g', 'd', 'rm'], None),
         ('ing', 'ingress', ['g', 'd', 'rm'], None),
         ('cm', 'configmap', ['g', 'd', 'rm'], None),
@@ -67,10 +68,8 @@ def main():
         ('oyaml', '-o=yaml', ['g'], ['owide', 'ojson', 'sl']),
         ('owide', '-o=wide', ['g'], ['oyaml', 'ojson']),
         ('ojson', '-o=json', ['g'], ['owide', 'oyaml', 'sl']),
-        ('all', '--all-namespaces', ['g', 'd'], ['rm', 'f', 'no', 'sys'
-         ]),
-        ('sl', '--show-labels', ['g'], ['oyaml', 'ojson']
-         + diff(res_types, ['po', 'dep'])),
+        ('all', '--all-namespaces', ['g', 'd'], ['rm', 'f', 'no', 'sys']),
+        ('sl', '--show-labels', ['g'], ['oyaml', 'ojson'], None),
         ('all', '--all', ['rm'], None), # caution: reusing the alias
         ('w', '--watch', ['g'], ['oyaml', 'ojson', 'owide']),
         ]
@@ -92,6 +91,17 @@ def main():
         (positional_args, True, True),
         ]
 
+    shellFormatting = {
+        "bash": "alias {}='{}'",
+        "zsh": "alias {}='{}'",
+        "fish": "abbr --add {} \"{}\"",
+    }
+
+    shell = sys.argv[1] if len(sys.argv) > 1 else "bash"
+    if shell not in shellFormatting:
+        raise ValueError("Shell \"{}\" not supported. Options are {}"
+                        .format(shell, [key for key in shellFormatting]))
+
     out = gen(parts)
 
     # prepare output
@@ -101,8 +111,9 @@ def main():
                          'license_header')
         with open(header_path, 'r') as f:
             print(f.read())
+
     for cmd in out:
-        print("alias {}='{}'".format(''.join([a[0] for a in cmd]),
+        print(shellFormatting[shell].format(''.join([a[0] for a in cmd]),
               ' '.join([a[1] for a in cmd])))
 
 
